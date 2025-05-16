@@ -14,7 +14,7 @@ spec:
     spec:
       project: "vault"
       source:
-        repoURL: https://github.com/eknudtson/vault-cd/
+        repoURL: https://github.com/eknudtson/vault-cd
         targetRevision: HEAD
         path: kustomize
       destination:
