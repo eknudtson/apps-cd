@@ -12,7 +12,7 @@ spec:
     metadata:
       name: '{{.name}}-vault' # 'name' field of the Secret
     spec:
-      project: "vault-cd"
+      project: "vault"
       source:
         repoURL: https://github.com/eknudtson/vault-cd/
         targetRevision: HEAD
