@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - clusters: {} # Automatically use all clusters defined within Argo CD
+  template:
+    metadata:
+      name: '{{.name}}-vault' # 'name' field of the Secret
+    spec:
+      project: "vault-cd"
+      source:
+        repoURL: https://github.com/eknudtson/vault-cd/
+        targetRevision: HEAD
+        path: kustomize
+      destination:
+        server: '{{.server}}' # 'server' field of the secret
+        namespace: vault
