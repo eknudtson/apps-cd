@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: vpn
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  description: vpn
+  destinations:
+  - name: in-cluster
+    namespace: vpn
+    server: https://kubernetes.default.svc
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - https://github.com/eknudtson/vpn-cd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: vpn
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - clusters: {} # Automatically use all clusters defined within Argo CD
+  template:
+    metadata:
+      name: '{{.name}}-vpn' # 'name' field of the Secret
+    spec:
+      project: "vpn"
+      source:
+        repoURL: https://github.com/eknudtson/vpn-cd
+        targetRevision: HEAD
+        path: kustomize
+      destination:
+        server: '{{.server}}' # 'server' field of the secret
+        namespace: vpn
