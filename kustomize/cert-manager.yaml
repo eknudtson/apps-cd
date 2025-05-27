@@ -10,7 +10,7 @@ spec:
   description: cert-manager
   destinations:
   - name: in-cluster
-    namespace: cert-manager
+    namespace: '*'
     server: https://kubernetes.default.svc
   namespaceResourceWhitelist:
   - group: '*'
