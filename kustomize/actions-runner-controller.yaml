@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: actions-runner-controller
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  description: actions-runner-controller
+  destinations:
+  - name: in-cluster
+    namespace: actions-runner-controller
+    server: https://kubernetes.default.svc
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - https://github.com/eknudtson/actions-runner-controller-cd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: actions-runner-controller
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - clusters: {} # Automatically use all clusters defined within Argo CD
+  template:
+    metadata:
+      name: '{{.name}}-actions-runner-controller' # 'name' field of the Secret
+    spec:
+      project: "actions-runner-controller"
+      source:
+        repoURL: https://github.com/eknudtson/actions-runner-controller-cd
+        targetRevision: HEAD
+        path: kustomize
+      destination:
+        server: '{{.server}}' # 'server' field of the secret
+        namespace: actions-runner-controller
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
