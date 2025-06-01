@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: opentelemetry-operator-system
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  description: opentelemetry-operator-system
+  destinations:
+  - name: in-cluster
+    namespace: opentelemetry-operator-system
+    server: https://kubernetes.default.svc
+  namespaceResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  sourceRepos:
+  - https://github.com/eknudtson/opentelemetry-operator-system-cd
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: opentelemetry-operator-system
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - clusters: {} # Automatically use all clusters defined within Argo CD
+  template:
+    metadata:
+      name: '{{.name}}-opentelemetry-operator-system' # 'name' field of the Secret
+    spec:
+      project: "opentelemetry-operator-system"
+      source:
+        repoURL: https://github.com/eknudtson/opentelemetry-operator-system-cd
+        targetRevision: HEAD
+        path: kustomize
+      destination:
+        server: '{{.server}}' # 'server' field of the secret
+        namespace: opentelemetry-operator-system
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
